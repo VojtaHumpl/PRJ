@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CodingSeb.ExpressionEvaluator" Version="1.4.37" />
+    <PackageReference Include="ProjectHaystack.Client" Version="2.0.12" />
+    <PackageReference Include="SharpVectors" Version="1.7.7" />
+    <PackageReference Include="Svg" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="res\" />
+  </ItemGroup>
+
+</Project>
