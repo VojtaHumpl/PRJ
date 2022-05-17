@@ -3,9 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DataVisualizer"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920" Loaded="Window_Loaded" MouseWheel="Window_MouseWheel">
+        xmlns:local="clr-namespace:DataVisualizer.ViewModels"
+		xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+		mc:Ignorable="d"
+        Title="MainWindow" Height="900" Width="1600" Loaded="Window_Loaded" MouseWheel="Window_MouseWheel">
+
+	<Window.DataContext>
+		<local:ViewModel/>
+	</Window.DataContext>
+
 	<Grid x:Name="gridMain">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="0.75*"/>
@@ -14,13 +20,37 @@
 		<Grid Grid.Column="0">
 			<TabControl x:Name="tabControl">
 				<TabItem Header="Plan">
-					<Border x:Name="border" BorderThickness="1.5" CornerRadius="4" Padding="6" BorderBrush="LightGray" Background="White" ClipToBounds="True" Height="1042" Width="1420">
+					<Border x:Name="border" BorderThickness="1.5" CornerRadius="4" Padding="6" BorderBrush="LightGray" Background="White" ClipToBounds="True">
 						<Image x:Name="image" VerticalAlignment="Stretch" Stretch="Uniform" HorizontalAlignment="Stretch" 
 					   MouseLeftButtonUp="Image_MouseLeftButtonUp" MouseMove="Image_MouseMove" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
 					</Border>
 				</TabItem>
 				<TabItem Header="Graphs">
-					<Grid Background="#FFE5E5E5"/>
+					<Border BorderThickness="1.5" CornerRadius="4" Padding="6" BorderBrush="LightGray" Background="White" ClipToBounds="True">
+						<Grid Name="gridCharts">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="0.5*"/>
+								<ColumnDefinition Width="0.5*"/>
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="0.5*"/>
+								<RowDefinition Height="0.5*"/>
+							</Grid.RowDefinitions>
+							<DockPanel Grid.Column="0" Grid.Row="0">
+								<lvc:CartesianChart Series="{Binding Series}">
+								</lvc:CartesianChart>
+							</DockPanel>
+							<DockPanel Grid.Column="1" Grid.Row="0">
+								<lvc:CartesianChart Series="{Binding Series2}" ZoomMode="Both">
+								</lvc:CartesianChart>
+							</DockPanel>
+						</Grid>
+					</Border>
+				</TabItem>
+				<TabItem Header="Data">
+					<Border BorderThickness="1.5" CornerRadius="4" Padding="6" BorderBrush="LightGray" Background="White" ClipToBounds="True">
+
+					</Border>
 				</TabItem>
 			</TabControl>
 		</Grid>
@@ -28,8 +58,12 @@
 			<GroupBox.Header>
 				<Label Content="Controls" FontWeight="Bold"/>
 			</GroupBox.Header>
-			<ScrollViewer VerticalAlignment="Top">
-				<Slider x:Name="zoomSlider" ValueChanged="ZoomSlider_ValueChanged" Value="1" Minimum="1"/>
+			<ScrollViewer VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
+				<Grid>
+					<Slider x:Name="zoomSlider" ValueChanged="ZoomSlider_ValueChanged" Value="1" Minimum="1" VerticalAlignment="Top" Margin="0,0,0,0"/>
+					<Button x:Name="buttonImportSVG" Content="Import SVG" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="38" Width="74" Click="buttonImportSVG_Click"/>
+					<Button x:Name="buttonImportData" Content="Import Data" HorizontalAlignment="Left" Margin="272,49,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="38" Width="74" Click="buttonImportData_Click"/>
+				</Grid>
 			</ScrollViewer>
 		</GroupBox>
 	</Grid>

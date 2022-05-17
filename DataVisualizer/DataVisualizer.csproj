@@ -9,9 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="CodingSeb.ExpressionEvaluator" Version="1.4.37" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.230" />
     <PackageReference Include="ProjectHaystack.Client" Version="2.0.12" />
     <PackageReference Include="SharpVectors" Version="1.7.7" />
-    <PackageReference Include="Svg" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>

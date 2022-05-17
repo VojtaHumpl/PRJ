@@ -12,15 +12,21 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Point = System.Windows.Point;
 
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using Microsoft.Win32;
+using System;
+using DataVisualizer.DataImporting;
+
 namespace DataVisualizer {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window {
 
-		private Point origin;
-		private Point start;
-		private Slider slider;
+		private Point FloorplanOrigin { get; set; }
+		private Point FloorplanStart { get; set; }
+		private Slider ZoomSlider { get; set; }
 
 		private bool FormLoaded { get; set; } = false;
 
@@ -29,25 +35,6 @@ namespace DataVisualizer {
 			InitializeComponent();
 
 
-			var source = @"..\..\..\res\floorplan.svg";
-
-			// Conversion options
-			WpfDrawingSettings settings = new ();
-			settings.IncludeRuntime = false;
-			settings.TextAsGeometry = true;
-
-			FileSvgReader converter = new(settings);
-
-			DrawingGroup drawing = converter.Read(source);
-
-			image.Source = new DrawingImage(drawing);
-			/*var x = new Bitmap(10, 10);
-			using (Graphics gfx = Graphics.FromImage(x))
-			using (SolidBrush brush = new SolidBrush(Color.FromArgb(255, 0, 0))) {
-				gfx.FillRectangle(brush, 0, 0, 10, 10);
-			}
-			image.Source = BitmapToImageSource(x);*/
-
 			//Setup a transform group that we'll use to manage panning of the image area
 			TransformGroup group = new();
 			ScaleTransform st = new();
@@ -55,9 +42,9 @@ namespace DataVisualizer {
 			TranslateTransform tt = new ();
 			group.Children.Add(tt);
 			//Wire up the slider to the image for zooming
-			slider = zoomSlider;
-			st.ScaleX = slider.Value;
-			st.ScaleY = slider.Value;
+			ZoomSlider = zoomSlider;
+			st.ScaleX = ZoomSlider.Value;
+			st.ScaleY = ZoomSlider.Value;
 			//_ImageScrollArea.RenderTransformOrigin = new Point(0.5, 0.5);
 			//_ImageScrollArea.LayoutTransform = group;
 			image.RenderTransformOrigin = new Point(0.5, 0.5);
@@ -98,20 +85,21 @@ namespace DataVisualizer {
 		}
 
 		private void Image_MouseMove(object sender, MouseEventArgs e) {
-			if (!image.IsMouseCaptured) return;
+			if (!image.IsMouseCaptured) 
+				return;
 
 			var tt = (TranslateTransform)((TransformGroup)image.RenderTransform).Children.First(tr => tr is TranslateTransform);
 
-			Vector v = start - e.GetPosition(border);
-			tt.X = origin.X - v.X;
-			tt.Y = origin.Y - v.Y;
+			Vector v = FloorplanStart - e.GetPosition(border);
+			tt.X = FloorplanOrigin.X - v.X;
+			tt.Y = FloorplanOrigin.Y - v.Y;
 		}
 
 		private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
 			image.CaptureMouse();
 			var tt = (TranslateTransform)((TransformGroup)image.RenderTransform).Children.First(tr => tr is TranslateTransform);
-			start = e.GetPosition(border);
-			origin = new Point(tt.X, tt.Y);
+			FloorplanStart = e.GetPosition(border);
+			FloorplanOrigin = new Point(tt.X, tt.Y);
 		}
 
 		private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
@@ -123,8 +111,8 @@ namespace DataVisualizer {
 
 			//Set the scale coordinates on the ScaleTransform from the slider
 			ScaleTransform transform = (ScaleTransform)((TransformGroup)panel.RenderTransform).Children.First(tr => tr is ScaleTransform);
-			transform.ScaleX = slider.Value;
-			transform.ScaleY = slider.Value;
+			transform.ScaleX = ZoomSlider.Value;
+			transform.ScaleY = ZoomSlider.Value;
 
 
 			//Set the zoom (this will affect rotate too) origin to the center of the panel
@@ -153,7 +141,47 @@ namespace DataVisualizer {
 		}
 
 		private void Window_MouseWheel(object sender, MouseWheelEventArgs e) {
-			slider.Value += slider.SmallChange * e.Delta / 60;
+			ZoomSlider.Value += ZoomSlider.SmallChange * e.Delta / 60;
+		}
+
+		private void buttonImportSVG_Click(object sender, RoutedEventArgs e) {
+			OpenFileDialog openFileDialog = new();
+			//openFileDialog.Multiselect = true;
+			openFileDialog.Filter = "SVG files (*.svg)|*.svg|All files (*.*)|*.*";
+			//openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+			openFileDialog.RestoreDirectory = false;
+			if (openFileDialog.ShowDialog() == true) {
+				//var source = @"..\..\..\res\floorplan.svg";
+				var source = openFileDialog.FileName;
+
+				// Conversion options
+				WpfDrawingSettings settings = new();
+				settings.IncludeRuntime = false;
+				settings.TextAsGeometry = true;
+
+				FileSvgReader converter = new(settings);
+
+				DrawingGroup drawing = converter.Read(source);
+
+				image.Source = new DrawingImage(drawing);
+
+				// reset position
+				var tt = (TranslateTransform)((TransformGroup)image.RenderTransform).Children.First(tr => tr is TranslateTransform);
+				tt.X = 0;
+				tt.Y = 0;
+			}
+		}
+
+		private void buttonImportData_Click(object sender, RoutedEventArgs e) {
+			OpenFileDialog openFileDialog = new();
+			openFileDialog.Multiselect = true;
+			openFileDialog.Filter = "SVG files (*.csv)|*.csv|All files (*.*)|*.*";
+			openFileDialog.RestoreDirectory = false;
+			if (openFileDialog.ShowDialog() == true) {
+				var source = openFileDialog.FileName;
+
+				var res = CSVImporter.ImportCSV(source);
+			}
 		}
 	}
 }
