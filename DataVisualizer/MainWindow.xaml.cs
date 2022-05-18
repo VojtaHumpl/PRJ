@@ -17,6 +17,9 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.Win32;
 using System;
 using DataVisualizer.DataImporting;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows.Data;
 
 namespace DataVisualizer {
 	/// <summary>
@@ -30,6 +33,8 @@ namespace DataVisualizer {
 
 		private bool FormLoaded { get; set; } = false;
 
+
+		private List<string> Data { get; set; }
 
 		public MainWindow() {
 			InitializeComponent();
@@ -150,6 +155,7 @@ namespace DataVisualizer {
 			openFileDialog.Filter = "SVG files (*.svg)|*.svg|All files (*.*)|*.*";
 			//openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 			openFileDialog.RestoreDirectory = false;
+			openFileDialog.CheckFileExists = true;
 			if (openFileDialog.ShowDialog() == true) {
 				//var source = @"..\..\..\res\floorplan.svg";
 				var source = openFileDialog.FileName;
@@ -177,10 +183,19 @@ namespace DataVisualizer {
 			openFileDialog.Multiselect = true;
 			openFileDialog.Filter = "SVG files (*.csv)|*.csv|All files (*.*)|*.*";
 			openFileDialog.RestoreDirectory = false;
+			openFileDialog.CheckFileExists = true;
 			if (openFileDialog.ShowDialog() == true) {
 				var source = openFileDialog.FileName;
 
 				var res = CSVImporter.ImportCSV(source);
+
+				for (int i = 0; i < res.Header.Length; i++) {
+					var col = new DataGridTextColumn();
+					col.Header = res.Header[i];
+					col.Binding = new Binding(string.Format("[{0}]", i));
+					dataGrid1.Columns.Add(col);
+				}
+				dataGrid1.ItemsSource = res.Rows;
 			}
 		}
 	}

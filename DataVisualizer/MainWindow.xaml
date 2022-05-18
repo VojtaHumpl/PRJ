@@ -49,7 +49,9 @@
 				</TabItem>
 				<TabItem Header="Data">
 					<Border BorderThickness="1.5" CornerRadius="4" Padding="6" BorderBrush="LightGray" Background="White" ClipToBounds="True">
-
+						<DataGrid Name="dataGrid1" AutoGenerateColumns="False" EnableRowVirtualization="True" EnableColumnVirtualization="True">
+							
+						</DataGrid>
 					</Border>
 				</TabItem>
 			</TabControl>
