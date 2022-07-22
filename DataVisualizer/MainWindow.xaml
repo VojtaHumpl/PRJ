@@ -1,28 +1,63 @@
 ﻿<Window x:Name="window" x:Class="DataVisualizer.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DataVisualizer.ViewModels"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+		xmlns:local="clr-namespace:DataVisualizer.ViewModels"
 		xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
 		mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1600" Loaded="Window_Loaded" MouseWheel="Window_MouseWheel">
+		Title="Data Vizualizer" Height="900" Width="1600" Loaded="Window_Loaded" MouseWheel="Window_MouseWheel">
 
-	<Window.DataContext>
-		<local:ViewModel/>
-	</Window.DataContext>
+	<Window.Resources>
+		<ResourceDictionary>
+			<Style TargetType="Image">
+				<Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+			</Style>
+		</ResourceDictionary>
+	</Window.Resources>
+
 
 	<Grid x:Name="gridMain">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="0.75*"/>
-			<ColumnDefinition Width="0.25*"/>
+			<ColumnDefinition Width="0.85*"/>
+			<ColumnDefinition Width="0.20*"/>
 		</Grid.ColumnDefinitions>
 		<Grid Grid.Column="0">
-			<TabControl x:Name="tabControl">
+			<TabControl x:Name="tabControl" BorderThickness="0">
 				<TabItem Header="Plan">
 					<Border x:Name="border" BorderThickness="1.5" CornerRadius="4" Padding="6" BorderBrush="LightGray" Background="White" ClipToBounds="True">
-						<Image x:Name="image" VerticalAlignment="Stretch" Stretch="Uniform" HorizontalAlignment="Stretch" 
-					   MouseLeftButtonUp="Image_MouseLeftButtonUp" MouseMove="Image_MouseMove" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
+						<Grid>
+							<Image x:Name="image" VerticalAlignment="Stretch" Stretch="Uniform" HorizontalAlignment="Stretch" 
+							MouseLeftButtonUp="Image_MouseLeftButtonUp" MouseMove="Image_MouseMove" MouseLeftButtonDown="Image_MouseLeftButtonDown">
+								<Image.LayoutTransform>
+									<TransformGroup>
+										<ScaleTransform/>
+										<TranslateTransform/>
+									</TransformGroup>
+								</Image.LayoutTransform>
+							</Image>
+
+							
+							<Canvas x:Name="canvas"
+								Width="{Binding ElementName=image, Path=ActualWidth, Mode=OneWay}"
+								Height="{Binding ElementName=image, Path=ActualHeight, Mode=OneWay}"
+								Margin="{Binding ElementName=image, Path=Margin, Mode=OneWay}">
+
+								<!--Grid Name="testGrid" Width="100" HorizontalAlignment="Center" VerticalAlignment="Top" Background="Transparent">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="30"/>
+										<RowDefinition Height="40"/>
+									</Grid.RowDefinitions>
+									<behaviors:Interaction.Behaviors>
+										<behaviors:MouseDragElementBehavior ConstrainToParentBounds="False"/>
+									</behaviors:Interaction.Behaviors>
+									<TextBox Background="LightPink" Grid.Row="0" BorderThickness="0" Text="Rectangle ROI" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+									<Image Grid.Row="1" IsHitTestVisible="False" Source="/Resources/thermometer.png" Stretch="Uniform"/>
+								</Grid-->
+
+							</Canvas>
+						</Grid>
 					</Border>
 				</TabItem>
 				<TabItem Header="Graphs">
@@ -36,23 +71,44 @@
 								<RowDefinition Height="0.5*"/>
 								<RowDefinition Height="0.5*"/>
 							</Grid.RowDefinitions>
+							<Grid.ContextMenu>
+								<ContextMenu>
+									<MenuItem Name="menuItemFull" Header="Add Full Size Graph" Click="menuItemFull_Click"/>
+									<MenuItem Name="menuItemHalf" Header="Add Half Size Graph"/>
+									<MenuItem Name="menuItemQuarter" Header="Add Quarter Size Graph"/>
+								</ContextMenu>
+							</Grid.ContextMenu>
+							<!--Button Name="buttonNewChart" Grid.ColumnSpan="2" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Height="50" Content="+" FontSize="24" Click="buttonNewChart_Click"/-->
 							<DockPanel Grid.Column="0" Grid.Row="0">
-								<lvc:CartesianChart Series="{Binding Series}">
-								</lvc:CartesianChart>
+								<Button HorizontalAlignment="Center" VerticalAlignment="Center" Content="+" Width="50" Height="50" FontSize="24" Click="Button_Click"/>
 							</DockPanel>
 							<DockPanel Grid.Column="1" Grid.Row="0">
-								<lvc:CartesianChart Series="{Binding Series2}" ZoomMode="Both">
-								</lvc:CartesianChart>
+								<Button HorizontalAlignment="Center" VerticalAlignment="Center" Content="+" Width="50" Height="50" FontSize="24" Click="Button_Click_1"/>
+							</DockPanel>
+							<DockPanel Grid.Column="0" Grid.Row="1">
+								<Button HorizontalAlignment="Center" VerticalAlignment="Center" Content="+" Width="50" Height="50" FontSize="24" Click="Button_Click_2"/>
+							</DockPanel>
+							<DockPanel Grid.Column="1" Grid.Row="1">
+								<Button HorizontalAlignment="Center" VerticalAlignment="Center" Content="+" Width="50" Height="50" FontSize="24" Click="Button_Click_3"/>
 							</DockPanel>
 						</Grid>
 					</Border>
 				</TabItem>
 				<TabItem Header="Data">
-					<Border BorderThickness="1.5" CornerRadius="4" Padding="6" BorderBrush="LightGray" Background="White" ClipToBounds="True">
-						<DataGrid Name="dataGrid1" AutoGenerateColumns="False" EnableRowVirtualization="True" EnableColumnVirtualization="True">
-							
+					<Border BorderThickness="1.5" CornerRadius="4" Padding="0" BorderBrush="LightGray" Background="White" ClipToBounds="True">
+						<DataGrid Name="dataGrid1" AutoGenerateColumns="False" EnableRowVirtualization="True" EnableColumnVirtualization="True" VirtualizingStackPanel.IsVirtualizing="true" BorderThickness="0">
+
 						</DataGrid>
 					</Border>
+				</TabItem>
+				<TabItem Name="tabItemPlus" Header="+" MouseUp="tabItemPlus_MouseUp" >
+					<TabItem.ContextMenu>
+						<ContextMenu>
+							<MenuItem Name="menuItemPlan" Header="Add Plan Tab" Click="menuItemPlan_Click"/>
+							<MenuItem Name="menuItemGraph" Header="Add Graph Tab"/>
+							<MenuItem Name="menuItemData" Header="Add Data Tab"/>
+						</ContextMenu>
+					</TabItem.ContextMenu>
 				</TabItem>
 			</TabControl>
 		</Grid>
@@ -63,10 +119,16 @@
 			<ScrollViewer VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
 				<Grid>
 					<Slider x:Name="zoomSlider" ValueChanged="ZoomSlider_ValueChanged" Value="1" Minimum="1" VerticalAlignment="Top" Margin="0,0,0,0"/>
-					<Button x:Name="buttonImportSVG" Content="Import SVG" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="38" Width="74" Click="buttonImportSVG_Click"/>
-					<Button x:Name="buttonImportData" Content="Import Data" HorizontalAlignment="Left" Margin="272,49,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="38" Width="74" Click="buttonImportData_Click"/>
+					<Button x:Name="buttonImportSVG" Content="Import SVG" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="38" Width="74" Click="buttonImportSVG_Click" Command="{Binding ImportSVGCommand}"/>
+					<Button x:Name="buttonImportData" Content="Import Data" HorizontalAlignment="Left" Margin="100,49,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Height="38" Width="74" Click="buttonImportData_Click" Command="{Binding ImportDataCommand}"/>
+					<Button Content="Add Sensor" Height="38" Width="74" Margin="10,140,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Click="Button_Click_4"/>
+					<Button Content="Save Project" Height="38" Width="74" Margin="10,200,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Click="Button_Click_5"/>
+					<Button Content="Load Project" Height="38" Width="74" Margin="100,200,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Click="Button_Click_6"/>
+					<Label Content="label" Height="25" Width="100" Margin="10,250,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left"/>
 				</Grid>
 			</ScrollViewer>
 		</GroupBox>
 	</Grid>
 </Window>
+	
+	

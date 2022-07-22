@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <floorplan>C:\Google Drive\Skola\VS\TUL\Projekt\DataVisualizer\DataVisualizer\Resources\floorplan.svg</floorplan>
+  <grid>
+    <text>example text</text>
+    <image>pack://application:,,,/DataVisualizer;component/Resources/thermometer.png</image>
+    <X>659</X>
+    <Y>245</Y>
+  </grid>
+  <grid>
+    <text>example text</text>
+    <image>pack://application:,,,/DataVisualizer;component/Resources/thermometer.png</image>
+    <X>632</X>
+    <Y>424</Y>
+  </grid>
+</Project>
